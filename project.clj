@@ -3,6 +3,7 @@
   :url "https://github.com/bendbennett/clojure-api-swagger-jwt"
   :min-lein-version "2.0.0"
   :dependencies [[org.clojure/clojure "1.9.0"]
+                 [buddy/buddy-auth "2.1.0"]
                  [buddy/buddy-core "1.5.0"]
                  [buddy/buddy-hashers "1.3.0"]
                  [buddy/buddy-sign "3.0.0"]
