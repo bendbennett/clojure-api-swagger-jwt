@@ -1,5 +1,5 @@
 (ns clojure-api-swagger-jwt.handler
-  (:require [clojure-api-swagger-jwt.jwt :as jwt]
+  (:require [clojure-api-swagger-jwt.auth :as auth]
             [compojure.core :refer :all]
             [compojure.handler :as handler]
             [compojure.route :as route]
@@ -8,12 +8,12 @@
             [ring.middleware.json :as json]
             [ring.middleware.reload :refer [wrap-reload]]))
 
-(defn create-auth-token [req]
-  (let [[ok? res] (jwt/create-auth-token {:username (get-in req [:body "username"])
-                                          :password (get-in req [:body "password"])})]
+(defn create-auth-token [request]
+  (let [[ok? result] (auth/create-auth-token {:username (get-in request [:body "username"])
+                                              :password (get-in request [:body "password"])})]
     (if ok?
-      {:status 201 :body res}
-      {:status 401 :body res})))
+      {:status 201 :body result}
+      {:status 401 :body result})))
 
 (defroutes api-routes
   (POST "/create-auth-token" [] create-auth-token)

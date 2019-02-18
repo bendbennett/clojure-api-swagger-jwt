@@ -26,12 +26,8 @@
   "Rolls back all datastore migrations."
   (rg-repl/rollback (ragtime-config) (Integer/MAX_VALUE)))
 
-(defn auth-user [credentials]
-  (let [user (users/find-by-username db-config {:username (:username credentials)})]
-    (if user
-      (if (hashers/check (:password credentials) (:password user))
-        [true {:user (dissoc user :password)}]
-        [false]))))
+(defn find-by-username [username]
+  (users/find-by-username db-config {:username username}))
 
 (defn create-user [username password]
   (users/insert-user db-config {:id       (java.util.UUID/randomUUID)
