@@ -21,9 +21,7 @@
 
 (defn home
   [request]
-  (if-not (authenticated? request)
-    {:status 401}
-    {:status 201 :body (:identity request)}))
+  {:status 201 :body (:identity request)})
 
 (defn on-error
   [request value]
