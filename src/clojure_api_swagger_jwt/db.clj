@@ -23,7 +23,7 @@
   (rg-repl/migrate (ragtime-config)))
 
 (defn rollback-all []
-  "Rolls back all datastore migrations."
+  "Rollback all migrations."
   (rg-repl/rollback (ragtime-config) (Integer/MAX_VALUE)))
 
 (defn find-by-username [username]
