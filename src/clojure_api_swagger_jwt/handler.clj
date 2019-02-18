@@ -1,5 +1,6 @@
 (ns clojure-api-swagger-jwt.handler
-  (:require [buddy.auth :refer [authenticated?]]
+  (:require [buddy.auth :refer [authenticated? throw-unauthorized]]
+            [buddy.auth.accessrules :refer [restrict success error]]
             [buddy.auth.backends :as backends]
             [buddy.auth.middleware :refer [wrap-authentication wrap-authorization]]
             [clojure-api-swagger-jwt.auth :as auth]
@@ -24,18 +25,30 @@
     {:status 401}
     {:status 201 :body (:identity request)}))
 
+(defn on-error
+  [request value]
+  {:status  403})
+
+(defn authenticated-user
+  [request]
+  (if (:identity request)
+    true
+    (error "Only authenticated users allowed")))
+
 (defroutes api-routes
-  (GET "/" [] home)
+  ;(GET "/" [] home)
+  (GET "/" [] (restrict home {:handler  authenticated-user
+                              :on-error on-error}))
   (POST "/create-auth-token" [] create-auth-token)
   (route/not-found ""))
 
-(def auth-backend
+(def authentication-backend
      (backends/jws {:secret  auth/public-key
                     :options {:alg :rs256}}))
 
 (def api
      (as-> (handler/api api-routes) $
-           (wrap-authentication $ auth-backend)
+           (wrap-authentication $ authentication-backend)
            (json/wrap-json-body $)
            (json/wrap-json-response $)))
 
