@@ -1,5 +1,7 @@
 (ns clojure-api-swagger-jwt.db
   (:require [buddy.hashers :as hashers]
+            [clojure-api-swagger-jwt.db.applications :as applications]
+            [clojure-api-swagger-jwt.db.groups :as groups]
             [clojure-api-swagger-jwt.db.users :as users]
             [environ.core :refer [env]]
             [ragtime.jdbc :as ragtime]
@@ -36,3 +38,11 @@
 
 (defn delete-all-users []
   (users/delete-all-users db-config))
+
+(defn create-application [name]
+  (applications/insert-application db-config {:id   (java.util.UUID/randomUUID)
+                                              :name name}))
+
+(defn create-group [name]
+  (groups/insert-group db-config {:id   (java.util.UUID/randomUUID)
+                                  :name name}))

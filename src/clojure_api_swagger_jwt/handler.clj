@@ -1,6 +1,6 @@
 (ns clojure-api-swagger-jwt.handler
   (:require [buddy.auth :refer [authenticated? throw-unauthorized]]
-            [buddy.auth.accessrules :refer [restrict success error]]
+            [buddy.auth.accessrules :refer [restrict success error wrap-access-rules]]
             [buddy.auth.backends :as backends]
             [buddy.auth.middleware :refer [wrap-authentication wrap-authorization]]
             [clojure-api-swagger-jwt.auth :as auth]
@@ -21,22 +21,20 @@
 
 (defn home
   [request]
-  {:status 201 :body (:identity request)})
+    {:status 200 :body (:identity request)})
 
 (defn on-error
   [request value]
-  {:status  403})
+  {:status 403})
 
-(defn authenticated-user
+(defn is-username-username?
   [request]
-  (if (:identity request)
+  (if (= "username" (get-in request [:identity :user :username]))
     true
-    (error "Only authenticated users allowed")))
+    (error "Username must = username")))
 
 (defroutes api-routes
-  ;(GET "/" [] home)
-  (GET "/" [] (restrict home {:handler  authenticated-user
-                              :on-error on-error}))
+  (GET "/home" [] home)
   (POST "/create-auth-token" [] create-auth-token)
   (route/not-found ""))
 
@@ -44,8 +42,12 @@
      (backends/jws {:secret  auth/public-key
                     :options {:alg :rs256}}))
 
+(def rules [{:pattern #"/home"
+             :handler is-username-username?}])
+
 (def api
      (as-> (handler/api api-routes) $
+           (wrap-access-rules $ {:rules rules :on-error on-error})
            (wrap-authentication $ authentication-backend)
            (json/wrap-json-body $)
            (json/wrap-json-response $)))
@@ -55,3 +57,7 @@
 
 (defn start-server-dev []
   (jetty/run-jetty (wrap-reload #'api) {:port (read-string (env :web-port))}))
+
+; (if (authenticated? request)) needs to be evaluated if just wrap authentication is going to be used
+;(if-not (authenticated? request)
+;  {:status 403}
