@@ -22,9 +22,10 @@
 (defn insert-group []
   (db/create-group (:name group-attributes)))
 
-; want to associate user with application and group
-;(defn insert-application []
-;  (db/create-application (:name application-attributes)))
+(defn insert-user-application-group []
+  (db/associate-user-application-group (:user_id (:id (db/find-by-username (:username user-attributes)))
+                                         :application_id (:id (db/find-application-by-name (:name application-attributes)))
+                                         :group_id (:id (db/find-group-by-name (:name goup-attributes))))))
 
 
 (defn migrate-rollback [f]

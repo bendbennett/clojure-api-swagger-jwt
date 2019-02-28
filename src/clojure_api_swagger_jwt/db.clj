@@ -3,6 +3,7 @@
             [clojure-api-swagger-jwt.db.applications :as applications]
             [clojure-api-swagger-jwt.db.groups :as groups]
             [clojure-api-swagger-jwt.db.users :as users]
+            [clojure-api-swagger-jwt.db.users-applications-groups :as users-applications-groups]
             [environ.core :refer [env]]
             [ragtime.jdbc :as ragtime]
             [ragtime.repl :as rg-repl]))
@@ -43,6 +44,17 @@
   (applications/insert-application db-config {:id   (java.util.UUID/randomUUID)
                                               :name name}))
 
+(defn find-application-by-name [name]
+  (applications/find-application-by-name db-config {:name name}))
+
 (defn create-group [name]
   (groups/insert-group db-config {:id   (java.util.UUID/randomUUID)
                                   :name name}))
+
+(defn find-group-by-name [name]
+  (groups/find-group-by-name db-config {:name name}))
+
+(defn associate-user-application-group [user-id application-id group-id]
+  (users-applications-groups/associate-user-application-group db-config {:user_id user-id
+                                                                         :application_id application-id
+                                                                         :group_id group-id}))
