@@ -9,7 +9,7 @@ set password = :password;
 -- :doc Delete all users
 delete from users;
 
--- :name find-by-username :? :1
+-- :name find-user-by-username :? :1
 -- :doc Get user by username
 select * from users
 where username = :username

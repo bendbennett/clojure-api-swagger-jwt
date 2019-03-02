@@ -3,15 +3,16 @@
             [buddy.hashers :as hashers]
             [buddy.sign.jwt :as jwt]
             [clj-time.core :as time]
-            [clojure-api-swagger-jwt.db :as db]
+            [clojure-api-swagger-jwt.db.users :as users]
             [environ.core :refer [env]]))
 
 (defn auth-user [credentials]
-  (let [user (db/find-by-username (:username credentials))]
+  (let [user (users/find-user-by-username {:username (:username credentials)})]
     (if user
       (if (hashers/check (:password credentials) (:password user))
         [true {:user (dissoc user :password)}]
-        [false]))))
+        [false])))
+  )
 
 (def private-key
      (keys/private-key (env :private-key) (env :passphrase-for-key)))

@@ -1,10 +1,6 @@
 (ns clojure-api-swagger-jwt.db
-  (:require [buddy.hashers :as hashers]
-            [clojure-api-swagger-jwt.db.applications :as applications]
-            [clojure-api-swagger-jwt.db.groups :as groups]
-            [clojure-api-swagger-jwt.db.users :as users]
-            [clojure-api-swagger-jwt.db.users-applications-groups :as users-applications-groups]
-            [environ.core :refer [env]]
+  (:require [environ.core :refer [env]]
+            [hugsql.core :as hugsql]
             [ragtime.jdbc :as ragtime]
             [ragtime.repl :as rg-repl]))
 
@@ -29,32 +25,14 @@
   "Rollback all migrations."
   (rg-repl/rollback (ragtime-config) (Integer/MAX_VALUE)))
 
-(defn find-by-username [username]
-  (users/find-by-username db-config {:username username}))
+(defn def-db-fns [file]
+  (hugsql/def-sqlvec-fns file)
 
-(defn create-user [username password]
-  (users/insert-user db-config {:id       (java.util.UUID/randomUUID)
-                                :username username
-                                :password (hashers/derive password)}))
+  (doseq [[k v] (hugsql/map-of-db-fns file)]
+    (let [fn-name (name k)]
+      (intern *ns*
+              (symbol fn-name)
+              (fn [& args] (apply (:fn v) db-config args))))))
 
-(defn delete-all-users []
-  (users/delete-all-users db-config))
-
-(defn create-application [name]
-  (applications/insert-application db-config {:id   (java.util.UUID/randomUUID)
-                                              :name name}))
-
-(defn find-application-by-name [name]
-  (applications/find-application-by-name db-config {:name name}))
-
-(defn create-group [name]
-  (groups/insert-group db-config {:id   (java.util.UUID/randomUUID)
-                                  :name name}))
-
-(defn find-group-by-name [name]
-  (groups/find-group-by-name db-config {:name name}))
-
-(defn associate-user-application-group [user-id application-id group-id]
-  (users-applications-groups/associate-user-application-group db-config {:user_id user-id
-                                                                         :application_id application-id
-                                                                         :group_id group-id}))
+(defn run-query [query params]
+  (apply (resolve query) [db-config params]))

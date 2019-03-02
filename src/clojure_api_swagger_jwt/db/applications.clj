@@ -1,4 +1,8 @@
 (ns clojure-api-swagger-jwt.db.applications
-  (:require [hugsql.core :as hugsql]))
+  (:require [clojure-api-swagger-jwt.db :as db]))
 
-(hugsql/def-db-fns "sql/applications.sql")
+(db/def-db-fns "sql/applications.sql")
+
+(defn create-application [name]
+  (insert-application {:id   (java.util.UUID/randomUUID)
+                       :name name}))

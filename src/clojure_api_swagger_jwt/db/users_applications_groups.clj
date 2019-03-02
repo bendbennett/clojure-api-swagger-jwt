@@ -1,4 +1,4 @@
 (ns clojure-api-swagger-jwt.db.users-applications-groups
-  (:require [hugsql.core :as hugsql]))
+  (:require [clojure-api-swagger-jwt.db :as db]))
 
-(hugsql/def-db-fns "sql/users-applications-groups.sql")
+(db/def-db-fns "sql/users-applications-groups.sql")
