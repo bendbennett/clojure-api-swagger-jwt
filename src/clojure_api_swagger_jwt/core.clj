@@ -16,4 +16,7 @@
 (defn -dev-main []
   (db/migrate)
   (fixtures/insert-user)
+  (fixtures/insert-application)
+  (fixtures/insert-group)
+  (fixtures/insert-user-application-group)
   (handler/start-server-dev))

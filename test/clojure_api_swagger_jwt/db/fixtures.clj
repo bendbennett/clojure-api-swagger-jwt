@@ -27,9 +27,9 @@
   (groups/create-group (:name group-attributes)))
 
 (defn insert-user-application-group []
-  (u-a-g/associate-user-application-group (:id (users/find-user-by-username (:username user-attributes)))
-                                          (:id (applications/find-application-by-name (:name application-attributes)))
-                                          (:id (groups/find-group-by-name (:name group-attributes)))))
+  (u-a-g/associate-user-application-group {:user_id (:id (users/find-user-by-username {:username (:username user-attributes)}))
+                                           :application_id (:id (applications/find-application-by-name {:name (:name application-attributes)}))
+                                           :group_id (:id (groups/find-group-by-name {:name (:name group-attributes)}))}))
 
 (defn migrate-rollback [f]
   (db/migrate)
