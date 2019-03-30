@@ -14,9 +14,10 @@
     ))
 
 (defn -dev-main []
+  (db/rollback-all)
   (db/migrate)
-  (fixtures/insert-user)
-  (fixtures/insert-application)
-  (fixtures/insert-group)
-  (fixtures/insert-user-application-group)
+  ;(fixtures/insert-user)
+  (fixtures/insert-applications)
+  ;(fixtures/insert-group)
+  ;(fixtures/insert-user-application-group)
   (handler/start-server-dev))

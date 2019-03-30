@@ -14,11 +14,20 @@
   (users/create-user (:username user-attributes)
                      (:password user-attributes)))
 
-(def ^:const application-attributes
-     {:name "application-name"})
+(def ^:const applications-attributes
+     [{:name "clojure-api"}
+      {:name "symfony-api"}
+      {:name "java-api"}])
 
-(defn insert-application []
-  (applications/create-application (:name application-attributes)))
+;(defn insert-application []
+;  (doseq [attributes application-attributes]
+;    (applications/create-application (:name attributes)))
+;  ;(applications/create-application (:name application-attributes))
+;
+;  )
+
+(defn insert-applications []
+  (applications/create-applications applications-attributes))
 
 (def ^:const group-attributes
      {:name "group-name"})
@@ -26,10 +35,10 @@
 (defn insert-group []
   (groups/create-group (:name group-attributes)))
 
-(defn insert-user-application-group []
-  (u-a-g/associate-user-application-group {:user_id (:id (users/find-user-by-username {:username (:username user-attributes)}))
-                                           :application_id (:id (applications/find-application-by-name {:name (:name application-attributes)}))
-                                           :group_id (:id (groups/find-group-by-name {:name (:name group-attributes)}))}))
+;(defn insert-user-application-group []
+;  (u-a-g/associate-user-application-group {:user_id (:id (users/find-user-by-username {:username (:username user-attributes)}))
+;                                           :application_id (:id (applications/find-application-by-name {:name (:name application-attributes)}))
+;                                           :group_id (:id (groups/find-group-by-name {:name (:name group-attributes)}))}))
 
 (defn migrate-rollback [f]
   (db/migrate)
