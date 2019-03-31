@@ -7,20 +7,13 @@
   (insert-application {:id   (java.util.UUID/randomUUID)
                        :name name}))
 
-;should be able to use threading macro here
+; comment to make clear what is being passed to HUGSQL i.e., [[uuid name] [uuid name]]
+; is there a different form for using map instead of for
 (defn create-applications [applications]
-  (insert-applications {:applications (vec (for [application applications]
-                                             [(java.util.UUID/randomUUID)
-                                              (:name application)]))})
-
-
-
-  ;[
-  ; [(java.util.UUID/randomUUID) "stuff 4"]
-  ; [(java.util.UUID/randomUUID) "stuff 5"]
-  ; [(java.util.UUID/randomUUID) "stuff 6"]
-  ; ]
-  ;(insert-applications {:applications applications})
-
-  )
+  (as-> applications a
+        (for [application a]
+          [(java.util.UUID/randomUUID)
+           (:name application)])
+        (vec a)
+        (insert-applications {:applications a})))
 
